@@ -13,41 +13,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const restaurantsContainer = document.querySelector('#restaurant-container')
   const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
-  const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
+  const formContainer = document.querySelector('#form-container')
 
 
-
-//********************** Add Likes to Restaurant *********************
+//*********************** Delegate Events for: ***********************
   allRestaurantsContainer.addEventListener('click', function(event) {
-
     let id;
     let increasedLikes;
+//********************* Add Likes to Restaurant **********************
     if (event.target.id === "likes-btn") {
       id = parseInt(event.target.dataset.id);
       let currentLikes = parseInt(event.target.innerText.split(' ').slice(-1)[0])
       increasedLikes = ++currentLikes
       event.target.innerText = `Likes: ${increasedLikes}`
+
+      allRestaurantsArray.forEach(function(restaurant) {
+        if (restaurant.id === id) {
+          restaurant.likes = increasedLikes;
+        }
+      })
+
+      fetch(`${restaurantsUrl}/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          likes: increasedLikes
+        })
+      })
+//******************* End of Add Likes to Restaurant *****************
+
+    } else if (event.target.id === "edit-btn") {
+      id = parseInt(event.target.dataset.id);
+      console.log(id)
     }
 
-    allRestaurantsArray.forEach(function(restaurant) {
-      if (restaurant.id === id) {
-        restaurant.likes = increasedLikes;
-      }
-    })
-
-    fetch(`${restaurantsUrl}/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify({
-        likes: increasedLikes
-      })
-    })
-
   })
-//******************* End of Add Likes to Restaurant *****************
+//********************* End of Event Delegation **********************
 
 
 //***************************** Fetches ******************************
@@ -73,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <p>Photo - ${singleRestaurant.photo}</p>
       <p>Food type: ${singleRestaurant.food_type}</p>
       <p>Location: ${singleRestaurant.location}</p>
-      <button id="likes-btn" data-id=${singleRestaurant.id}>Likes: ${singleRestaurant.likes}</button><button>Edit</button>
+      <button id="likes-btn" data-id=${singleRestaurant.id}>Likes: ${singleRestaurant.likes}</button><button id="edit-btn" data-id=${singleRestaurant.id}>Edit</button>
       `
   }
 
