@@ -13,27 +13,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const restaurantsContainer = document.querySelector('#restaurant-container')
   const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
-  const formContainer = document.querySelector('#form-container')
 
 
 //*********************** Delegate Events for: ***********************
   allRestaurantsContainer.addEventListener('click', function(event) {
-    let id;
+    let likesId;
     let increasedLikes;
+    let updateId;
 //********************* Add Likes to Restaurant **********************
     if (event.target.id === "likes-btn") {
-      id = parseInt(event.target.dataset.id);
+      likesId = parseInt(event.target.dataset.id);
       let currentLikes = parseInt(event.target.innerText.split(' ').slice(-1)[0])
       increasedLikes = ++currentLikes
       event.target.innerText = `Likes: ${increasedLikes}`
 
       allRestaurantsArray.forEach(function(restaurant) {
-        if (restaurant.id === id) {
+        if (restaurant.id === likesId) {
           restaurant.likes = increasedLikes;
         }
       })
 
-      fetch(`${restaurantsUrl}/${id}`, {
+      fetch(`${restaurantsUrl}/${likesId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -45,10 +45,52 @@ document.addEventListener('DOMContentLoaded', function() {
       })
 //******************* End of Add Likes to Restaurant *****************
 
+
+//************************** Edit Restaurant *************************
     } else if (event.target.id === "edit-btn") {
-      id = parseInt(event.target.dataset.id);
-      console.log(id)
+      updateId = parseInt(event.target.dataset.id);
+      let restaurantToUpdate = allRestaurantsArray.find(function(restaurant) {
+        return restaurant.id === updateId;
+      })
+
+      formContainer = event.target.parentElement.querySelector('#form-container')
+      renderUpdateForm(restaurantToUpdate)
+
+      formContainer.addEventListener('submit', function(event) {
+        event.preventDefault();
+        updatedName = event.target.querySelector('#name').value
+        updatedFoodType = event.target.querySelector('#food_type').value
+        updatedLocation = event.target.querySelector('#location').value
+
+        event.target.parentElement.parentElement.querySelector('#page-name').innerText = updatedName
+        event.target.parentElement.parentElement.querySelector('#page-food-type').innerText = `Food type: ${updatedFoodType}`
+        event.target.parentElement.parentElement.querySelector('#page-location').innerText = `Location: ${updatedLocation}`
+
+
+        allRestaurantsArray.forEach(function(restaurant) {
+          if (restaurant.id === updateId) {
+            restaurant.name = updatedName;
+            restaurant.food_type = updatedFoodType;
+            restaurant.location = updatedLocation;
+          }
+        })
+
+        fetch(`${restaurantsUrl}/${updateId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({
+            name: updatedName,
+            food_type: updatedFoodType,
+            location: updatedLocation
+          })
+        })
+
+      })
     }
+    //*********************** End of Edit Restaurant *********************
 
   })
 //********************* End of Event Delegation **********************
@@ -73,28 +115,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function renderSingleRestaurant(singleRestaurant) {
     restaurantsContainer.innerHTML += `
-      <h2>${singleRestaurant.name}</h2>
-      <p>Photo - ${singleRestaurant.photo}</p>
-      <p>Food type: ${singleRestaurant.food_type}</p>
-      <p>Location: ${singleRestaurant.location}</p>
+
+      <div data-id=${singleRestaurant.id} class="restaurant-entry">
+      <h2 id="page-name">${singleRestaurant.name}</h2>
+      <p id="page-photo">Photo - ${singleRestaurant.photo}</p>
+      <p id="page-food-type">Food type: ${singleRestaurant.food_type}</p>
+      <p id="page-location">Location: ${singleRestaurant.location}</p>
       <button id="likes-btn" data-id=${singleRestaurant.id}>Likes: ${singleRestaurant.likes}</button><button id="edit-btn" data-id=${singleRestaurant.id}>Edit</button>
+      <div data-id=${singleRestaurant.id} id="form-container">
+      </div>
+      </div>
       `
   }
 
-  function renderUpdateForm() {
-    return `
-    <form data-id=${this.id}>
-      <label>Title</label>
+  function renderUpdateForm(restaurantToUpdate) {
+    formContainer.innerHTML = `
+    <form data-id=${restaurantToUpdate.id}>
+      <h3>---Update Food Stop---</h3>
+      <label>Food Stop Name:</label>
       <p>
-        <input type="text" value="${this.title}" />
+        <input id="name" type="text" value="${restaurantToUpdate.name}" />
       </p>
-      <label>Content</label>
+      <label>Food Stop Type:</label>
       <p>
-        <textarea>${this.content}</textarea>
+        <input id="food_type" type="text" value="${restaurantToUpdate.food_type}" />
       </p>
-      <button type='submit'>Save Note</button>
+      <label>Food Stop Location:</label>
+      <p>
+        <input id="location" type="text" value="${restaurantToUpdate.location}" />
+      </p>
+      <button type='submit'>Save Food Stop</button>
     </form>
-  `;
+    `;
   }
 //************************* End of Functions *************************
 
