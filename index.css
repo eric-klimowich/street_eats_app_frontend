@@ -12,6 +12,10 @@ body {
   text-shadow: 2px 2px gray;
 }
 
+#heading {
+  display: none;
+}
+
 #page-title {
   text-align: center;
 }
@@ -20,12 +24,21 @@ body {
   text-align: center;
 }
 
+#add-user {
+  display: none;
+}
+
+#restaurant-container {
+  display: none;
+}
+
 .restaurant-entry {
   color: white;
   background-color: maroon;
   border: 10px inset saddlebrown;
   padding: 10px;
   width: 20%;
+  margin: 10px;
   /* float: left;
   width: 250px;
   margin: auto; */
@@ -37,9 +50,6 @@ body {
   margin-top: 50px;
 }
 
-
-
-
-.pokemon-container {
+.restaurant-container {
 
 }

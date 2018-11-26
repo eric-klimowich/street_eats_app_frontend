@@ -6,31 +6,36 @@ const usersUrl = "http://localhost:3000/api/v1/users";
 const commentsUrl = "http://localhost:3000/api/v1/comments";
 let allRestaurantsArray = [];
 let allUsersArray = [];
+let addedUserId;
 //********************** End of Global Variables *********************
 
 
-//******************* Listen for DOMContentLoaded ********************
+//******************* Listen for DOMContentLoaded ********************>>>>>
 document.addEventListener('DOMContentLoaded', function() {
 
+
+//******** Variables Local to DOMContentLoaded Event Listener ********
   const restaurantsContainer = document.querySelector('#restaurant-container')
   const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
   const allUsersContainer = document.querySelector('#users-container')
   const addUserForm = document.querySelector('#add-user');
+  const userChoiceButtons = document.querySelector('#welcome')
+  const addRestaurantFormContainer = document.querySelector('#add-restaurant-form')
+//***** End of Variables Local to DOMContentLoaded Event Listener ****
 
-//*************************** Get All Users **************************
-  fetch(usersUrl)
-  .then(res => res.json())
-  .then(allUsers => {
-    console.log(allUsers)
-    allUsersArray = allUsers
+
+//********************** Choose New/Return User **********************
+  userChoiceButtons.addEventListener('click', function(event) {
+    if (event.target.id === 'new-user-btn') {
+      addUserForm.style.display = 'initial'
+    } else if (event.target.id === 'ret-user-btn') {
+      console.log(event.target)
+    }
   })
-  // function renderAllUsers(usersArray) {
-  //   user
-  // }
-//*********************** End of Get All Users ***********************
+//******************* End of Choose New/Return User ******************
 
 
-//***************************** Add User *****************************
+//************************* Add a New User ****************************
   addUserForm.innerHTML = `
     <form id="new-user-form">
       <h3>---User Form---</h3>
@@ -68,10 +73,30 @@ document.addEventListener('DOMContentLoaded', function() {
         fav_food: userFavFood
       })
     })
+      .then(res => res.json())
+      .then(addedUser => {
+        addedUserId = addedUser.id
+      })
+
+      hideAddUserForm()
+      renderNewRestaurantForm()
+      revealRestaurants()
 
   })
+//*********************** End of Add a New User **********************
 
 
+//*************************** Get All Users **************************
+  fetch(usersUrl)
+  .then(res => res.json())
+  .then(allUsers => {
+    console.log(allUsers)
+    allUsersArray = allUsers
+  })
+//*********************** End of Get All Users ***********************
+
+
+//********************* Select from Existing User ********************
   //   <form>
   // Select your favorite fruit:
   // <select id="mySelect">
@@ -85,10 +110,54 @@ document.addEventListener('DOMContentLoaded', function() {
   // <p>Click the button to return the value of the selected fruit.</p>
   //
   // <button type="button" onclick="myFunction()">Try it</button>
-//************************** End of Add User *************************
+//****************** End of Select from Existing User ****************
 
 
-//*********************** Delegate Events for: ***********************
+//*********************** Get All Restaurants ************************
+  fetch(restaurantsUrl)
+  .then(res => res.json())
+  .then(allRestaurants => {
+    console.log(allRestaurants)
+    allRestaurantsArray = allRestaurants;
+    renderAllRestaurants(allRestaurantsArray);
+  });
+//******************* End of Get All Restaurants**********************
+
+
+//*************************** Add Restaurant *************************
+  addRestaurantFormContainer.addEventListener('submit', function(event) {
+    event.preventDefault()
+    let newRestaurantName = event.target.querySelector('#new-name').value
+    let newRestaurantFoodType = event.target.querySelector('#new-food_type').value
+    let newRestaurantLocation = event.target.querySelector('#new-location').value
+    document.querySelector('#new-restaurant-form').reset()
+
+    fetch(restaurantsUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        name: newRestaurantName,
+        location: newRestaurantLocation,
+        food_type: newRestaurantFoodType,
+        likes: 0,
+        photo: "none",
+        user_id: addedUserId
+      })
+    })
+      .then(res => res.json())
+      .then(addedRestaurant => {
+        console.log(addedRestaurant)
+        renderSingleRestaurant(addedRestaurant)
+      })
+
+  })
+//************************ End of Add Restaurant *********************
+
+
+//****************** Delegate Events for Restaurants *****************
   allRestaurantsContainer.addEventListener('click', function(event) {
     let likesId;
     let increasedLikes;
@@ -127,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
       })
 
       formContainer = event.target.parentElement.querySelector('#form-container')
-      renderUpdateForm(restaurantToUpdate)
+      renderUpdateRestaurant(restaurantToUpdate)
 
       formContainer.addEventListener('submit', function(event) {
         event.preventDefault();
@@ -166,20 +235,18 @@ document.addEventListener('DOMContentLoaded', function() {
 //*********************** End of Edit Restaurant *********************
 
   })
-//********************* End of Event Delegation **********************
-
-
-//***************************** Fetches ******************************
-  fetch(restaurantsUrl)
-    .then(res => res.json())
-    .then(allRestaurants => {
-      allRestaurantsArray = allRestaurants;
-      renderAllRestaurants(allRestaurantsArray);
-    });
-//************************* End of Fetches ***************************
+//************* End of Event Delegation for Restaurants **************
 
 
 //**************************** Functions *****************************
+  function revealRestaurants() {
+    restaurantsContainer.style.display = 'initial'
+  }
+
+  function hideAddUserForm() {
+    addUserForm.style.display = 'none'
+  }
+
   function renderAllRestaurants(restaurantArray) {
     restaurantArray.forEach(function(singleRestaurant) {
       renderSingleRestaurant(singleRestaurant);
@@ -201,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
       `
   }
 
-  function renderUpdateForm(restaurantToUpdate) {
+  function renderUpdateRestaurant(restaurantToUpdate) {
     formContainer.innerHTML = `
     <form data-id=${restaurantToUpdate.id}>
       <h3>---Update Food Stop---</h3>
@@ -221,7 +288,29 @@ document.addEventListener('DOMContentLoaded', function() {
     </form>
     `
   }
+
+  function renderNewRestaurantForm() {
+    addRestaurantFormContainer.innerHTML = `
+    <form id="new-restaurant-form">
+      <h3>---Add Food Stop---</h3>
+      <label>Food Stop Name:</label>
+      <p>
+        <input id="new-name" type="text" placeholder="Restaurant name..." />
+      </p>
+      <label>Food Stop Type:</label>
+      <p>
+        <input id="new-food_type" type="text" placeholder="Type of food served..." />
+      </p>
+      <label>Food Stop Location:</label>
+      <p>
+        <input id="new-location" type="text" placeholder="Location last seen..." />
+      </p>
+      <button type='submit'>Save Food Stop</button>
+    </form>
+    `
+  }
 //************************* End of Functions *************************
 
+
 })
-//**************** End of Listen for DOMContentLoaded ****************
+//**************** End of Listen for DOMContentLoaded ****************<<<<<
