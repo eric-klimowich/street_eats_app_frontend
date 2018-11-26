@@ -21,15 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
   const addUserForm = document.querySelector('#add-user');
   const userChoiceButtons = document.querySelector('#welcome')
   const addRestaurantFormContainer = document.querySelector('#add-restaurant-form')
+  const selectUserForm = document.querySelector('#users-container')
 //***** End of Variables Local to DOMContentLoaded Event Listener ****
 
 
 //********************** Choose New/Return User **********************
   userChoiceButtons.addEventListener('click', function(event) {
     if (event.target.id === 'new-user-btn') {
-      addUserForm.style.display = 'initial'
+      showAddUserForm()
     } else if (event.target.id === 'ret-user-btn') {
-      console.log(event.target)
+      showSelectUserForm()
+      renderAllUsersToSelectForm(allUsersArray)
     }
   })
 //******************* End of Choose New/Return User ******************
@@ -90,26 +92,26 @@ document.addEventListener('DOMContentLoaded', function() {
   fetch(usersUrl)
   .then(res => res.json())
   .then(allUsers => {
-    console.log(allUsers)
     allUsersArray = allUsers
   })
 //*********************** End of Get All Users ***********************
 
 
 //********************* Select from Existing User ********************
-  //   <form>
-  // Select your favorite fruit:
-  // <select id="mySelect">
-  //   <option value="apple">Apple</option>
-  //   <option value="orange">Orange</option>
-  //   <option value="pineapple">Pineapple</option>
-  //   <option value="banana">Banana</option>
-  // </select>
-  // </form>
-  //
-  // <p>Click the button to return the value of the selected fruit.</p>
-  //
-  // <button type="button" onclick="myFunction()">Try it</button>
+  selectUserForm.innerHTML = `
+    <form id="select-ret-user">
+      <select id="userSelection">
+      </select>
+      <button type="submit" value="submit">Select User</button>
+    </form>
+    <p>Choose your profile.</p>
+    `
+
+  selectUserForm.addEventListener('submit', function(event) {
+    event.preventDefault()
+    debugger
+    console.log(event.target)
+  })
 //****************** End of Select from Existing User ****************
 
 
@@ -238,13 +240,45 @@ document.addEventListener('DOMContentLoaded', function() {
 //************* End of Event Delegation for Restaurants **************
 
 
+
+//************************* Fetch Comments ***************************
+  fetch(commentsUrl)
+    .then(res => res.json())
+    .then(allComments => {
+      console.log(allComments)
+    })
+    //********************** End of Fetch Comments ***********************
+
+
+
 //**************************** Functions *****************************
+  function renderAllUsersToSelectForm(userArray) {
+    allUsersArray.forEach(function(user) {
+      renderSingleUsertoSelectForm(user)
+    })
+  }
+
+  function renderSingleUsertoSelectForm(user) {
+    let userDropdown = document.querySelector('#userSelection')
+    userDropdown.innerHTML += `
+      <option value=${user}>${user.name}</option>
+      `
+  }
+
   function revealRestaurants() {
     restaurantsContainer.style.display = 'initial'
   }
 
   function hideAddUserForm() {
     addUserForm.style.display = 'none'
+  }
+
+  function showAddUserForm() {
+    addUserForm.style.display = 'initial'
+  }
+
+  function showSelectUserForm() {
+    selectUserForm.style.display = 'initial'
   }
 
   function renderAllRestaurants(restaurantArray) {

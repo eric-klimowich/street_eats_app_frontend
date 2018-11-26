@@ -28,6 +28,10 @@ body {
   display: none;
 }
 
+#users-container {
+  display: none;
+}
+
 #restaurant-container {
   display: none;
 }
