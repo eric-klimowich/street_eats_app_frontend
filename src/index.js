@@ -5,6 +5,7 @@ const restaurantsUrl = "http://localhost:3000/api/v1/restaurants";
 const usersUrl = "http://localhost:3000/api/v1/users";
 const commentsUrl = "http://localhost:3000/api/v1/comments";
 let allRestaurantsArray = [];
+let allUsersArray = [];
 //********************** End of Global Variables *********************
 
 
@@ -13,6 +14,78 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const restaurantsContainer = document.querySelector('#restaurant-container')
   const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
+  const allUsersContainer = document.querySelector('#users-container')
+  const addUserForm = document.querySelector('#add-user');
+
+//*************************** Get All Users **************************
+  fetch(usersUrl)
+  .then(res => res.json())
+  .then(allUsers => {
+    console.log(allUsers)
+    allUsersArray = allUsers
+  })
+  // function renderAllUsers(usersArray) {
+  //   user
+  // }
+//*********************** End of Get All Users ***********************
+
+
+//***************************** Add User *****************************
+  addUserForm.innerHTML = `
+    <form id="new-user-form">
+      <h3>---User Form---</h3>
+      <label>User Name:</label>
+      <p>
+        <input id="user-name" type="text" placeholder="enter name..." />
+      </p>
+      <label>Location:</label>
+      <p>
+        <input id="user-location" type="text" placeholder="enter location..." />
+      </p>
+      <label>Favorite Food:</label>
+      <p>
+        <input id="user-fav-food" type="text" placeholder="enter favorite food..." />
+      </p>
+      <button type='submit' value='submit'>Submit</button>
+    </form>
+    `
+  addUserForm.addEventListener('submit', function(event) {
+    event.preventDefault()
+    let userName = event.target.querySelector('#user-name').value
+    let userLocation = event.target.querySelector('#user-location').value
+    let userFavFood = event.target.querySelector('#user-fav-food').value
+    document.querySelector('#new-user-form').reset()
+
+    fetch(usersUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify({
+        name: userName,
+        location: userLocation,
+        fav_food: userFavFood
+      })
+    })
+
+  })
+
+
+  //   <form>
+  // Select your favorite fruit:
+  // <select id="mySelect">
+  //   <option value="apple">Apple</option>
+  //   <option value="orange">Orange</option>
+  //   <option value="pineapple">Pineapple</option>
+  //   <option value="banana">Banana</option>
+  // </select>
+  // </form>
+  //
+  // <p>Click the button to return the value of the selected fruit.</p>
+  //
+  // <button type="button" onclick="myFunction()">Try it</button>
+//************************** End of Add User *************************
 
 
 //*********************** Delegate Events for: ***********************
@@ -58,9 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
       formContainer.addEventListener('submit', function(event) {
         event.preventDefault();
-        updatedName = event.target.querySelector('#name').value
-        updatedFoodType = event.target.querySelector('#food_type').value
-        updatedLocation = event.target.querySelector('#location').value
+        let updatedName = event.target.querySelector('#name').value
+        let updatedFoodType = event.target.querySelector('#food_type').value
+        let updatedLocation = event.target.querySelector('#location').value
 
         event.target.parentElement.parentElement.querySelector('#page-name').innerText = updatedName
         event.target.parentElement.parentElement.querySelector('#page-food-type').innerText = `Food type: ${updatedFoodType}`
@@ -90,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       })
     }
-    //*********************** End of Edit Restaurant *********************
+//*********************** End of Edit Restaurant *********************
 
   })
 //********************* End of Event Delegation **********************
@@ -146,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </p>
       <button type='submit'>Save Food Stop</button>
     </form>
-    `;
+    `
   }
 //************************* End of Functions *************************
 
