@@ -109,8 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   selectUserForm.addEventListener('submit', function(event) {
     event.preventDefault()
-    debugger
-    console.log(event.target)
+    addedUserId = document.getElementById('userSelection').value
+    hideSelectUserForm()
+    renderNewRestaurantForm()
+    revealRestaurants()
   })
 //****************** End of Select from Existing User ****************
 
@@ -240,15 +242,13 @@ document.addEventListener('DOMContentLoaded', function() {
 //************* End of Event Delegation for Restaurants **************
 
 
-
 //************************* Fetch Comments ***************************
   fetch(commentsUrl)
     .then(res => res.json())
     .then(allComments => {
       console.log(allComments)
     })
-    //********************** End of Fetch Comments ***********************
-
+//********************** End of Fetch Comments ***********************
 
 
 //**************************** Functions *****************************
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderSingleUsertoSelectForm(user) {
     let userDropdown = document.querySelector('#userSelection')
     userDropdown.innerHTML += `
-      <option value=${user}>${user.name}</option>
+      <option value=${user.id}>${user.name}</option>
       `
   }
 
@@ -279,6 +279,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function showSelectUserForm() {
     selectUserForm.style.display = 'initial'
+  }
+
+  function hideSelectUserForm() {
+    selectUserForm.style.display = 'none'
   }
 
   function renderAllRestaurants(restaurantArray) {
