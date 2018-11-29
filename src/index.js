@@ -7,6 +7,8 @@ const commentsUrl = "http://localhost:3000/api/v1/comments";
 let allRestaurantsArray = [];
 let allUsersArray = [];
 let addedUserId;
+let commentsContainer;
+let formContainer;
 //********************** End of Global Variables *********************
 
 
@@ -17,11 +19,14 @@ document.addEventListener('DOMContentLoaded', function() {
 //******** Variables Local to DOMContentLoaded Event Listener ********
   const restaurantsContainer = document.querySelector('#restaurant-container')
   const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
-  const allUsersContainer = document.querySelector('#users-container')
   const addUserForm = document.querySelector('#add-user');
   const userChoiceButtons = document.querySelector('#welcome')
   const addRestaurantFormContainer = document.querySelector('#add-restaurant-form')
   const selectUserForm = document.querySelector('#users-container')
+  const headingDiv = document.querySelector('#heading')
+  const commentsContainers = document.querySelectorAll('#comments-container')
+  const restaurantsSearchContainer = document.querySelector('#search-restaurant-container')
+  const userButtons = document.getElementsByClassName('user-btns')
 //***** End of Variables Local to DOMContentLoaded Event Listener ****
 
 
@@ -80,7 +85,9 @@ document.addEventListener('DOMContentLoaded', function() {
         addedUserId = addedUser.id
       })
 
+      hideWelcomePage()
       hideAddUserForm()
+      revealHeading()
       renderNewRestaurantForm()
       revealRestaurants()
 
@@ -106,11 +113,12 @@ document.addEventListener('DOMContentLoaded', function() {
     </form>
     <p>Choose your profile.</p>
     `
-
   selectUserForm.addEventListener('submit', function(event) {
     event.preventDefault()
-    addedUserId = document.getElementById('userSelection').value
+    addedUserId = parseInt(document.getElementById('userSelection').value)
+    hideWelcomePage()
     hideSelectUserForm()
+    revealHeading()
     renderNewRestaurantForm()
     revealRestaurants()
   })
@@ -121,9 +129,8 @@ document.addEventListener('DOMContentLoaded', function() {
   fetch(restaurantsUrl)
   .then(res => res.json())
   .then(allRestaurants => {
-    console.log(allRestaurants)
     allRestaurantsArray = allRestaurants;
-    renderAllRestaurants(allRestaurantsArray);
+    renderAllRestaurants(allRestaurants);
   });
 //******************* End of Get All Restaurants**********************
 
@@ -132,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
   addRestaurantFormContainer.addEventListener('submit', function(event) {
     event.preventDefault()
     let newRestaurantName = event.target.querySelector('#new-name').value
+    let newRestaurantPhoto = event.target.querySelector('#new-photo').value
     let newRestaurantFoodType = event.target.querySelector('#new-food_type').value
     let newRestaurantLocation = event.target.querySelector('#new-location').value
     document.querySelector('#new-restaurant-form').reset()
@@ -147,18 +155,25 @@ document.addEventListener('DOMContentLoaded', function() {
         location: newRestaurantLocation,
         food_type: newRestaurantFoodType,
         likes: 0,
-        photo: "none",
+        photo: newRestaurantPhoto,
         user_id: addedUserId
       })
     })
       .then(res => res.json())
       .then(addedRestaurant => {
-        console.log(addedRestaurant)
         renderSingleRestaurant(addedRestaurant)
       })
 
   })
 //************************ End of Add Restaurant *********************
+
+
+//************************* Search Restaurants ***********************
+  restaurantsSearchContainer.addEventListener('input', function(event) {
+    console.log(event.target.value)
+  })
+
+//********************** End of Search Restaurants *******************
 
 
 //****************** Delegate Events for Restaurants *****************
@@ -212,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event.target.parentElement.parentElement.querySelector('#page-food-type').innerText = `Food type: ${updatedFoodType}`
         event.target.parentElement.parentElement.querySelector('#page-location').innerText = `Location: ${updatedLocation}`
 
+        formContainer.innerHTML = ""
 
         allRestaurantsArray.forEach(function(restaurant) {
           if (restaurant.id === updateId) {
@@ -235,20 +251,115 @@ document.addEventListener('DOMContentLoaded', function() {
         })
 
       })
-    }
 //*********************** End of Edit Restaurant *********************
+
+
+//********************* Add Comment to Restaurant ********************
+    } else if (event.target.id === "add-comment-btn") {
+      event.preventDefault()
+      let newComment = event.target.parentElement.querySelector('#comment-content').value
+      let commentRestaurantId = parseInt(event.target.parentElement.dataset.id)
+
+      let currentCommentContainer = event.target.parentElement.parentElement.parentElement.querySelector(`#comments-container-${commentRestaurantId}`)
+
+      event.target.parentElement.reset()
+
+      fetch(commentsUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          content: newComment,
+          likes: 0,
+          dislikes: 0,
+          restaurant_id: commentRestaurantId,
+          user_id: addedUserId
+        })
+      })
+        .then(res => res.json())
+        .then(returnedComment => {
+          currentCommentContainer.innerHTML += `
+            <li>${returnedComment.content}</li>
+            <button data-id=${returnedComment.id} id="comment-like-btn">Likes: 0</button><button data-id=${returnedComment.id} id="comment-dislike-btn">Dislikes: 0</button>
+            `
+        })
+
+        //
+//****************** End of Add Comment to Restaurant ****************
+
+
+//************************ Add Like to Comment ***********************
+    } else if (event.target.id === "comment-like-btn") {
+
+      let currentCommentLikes = parseInt(event.target.innerText.split(' ')[1])
+      let increasedCommentLikes = currentCommentLikes + 1
+      let commentLikesId = parseInt(event.target.dataset.id)
+
+      let commentLikesRestaurantId = parseInt(event.target.parentElement.parentElement.parentElement.dataset.id)
+
+      event.target.innerText = `Likes: ${increasedCommentLikes}`
+
+      allRestaurantsArray.forEach(function(restaurant) {
+        if (restaurant.id === commentLikesRestaurantId) {
+          restaurant.comments.forEach(function(comment) {
+            if (comment.id === commentLikesId) {
+              comment.likes = increasedCommentLikes
+            }
+          })
+        }
+      })
+
+      fetch(`${commentsUrl}/${commentLikesId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          likes: increasedCommentLikes
+        })
+      })
+//********************* End of Add Like to Comment *******************
+
+
+//*********************** Add Disike to Comment **********************
+    } else if (event.target.id === "comment-dislike-btn") {
+      let currentCommentDislikes = parseInt(event.target.innerText.split(' ')[1])
+      let increasedCommentDislikes = currentCommentDislikes + 1
+      let commentDislikesId = parseInt(event.target.dataset.id)
+
+      let commentDislikesRestaurantId = parseInt(event.target.parentElement.parentElement.parentElement.dataset.id)
+
+      event.target.innerText = `Likes: ${increasedCommentDislikes}`
+
+      allRestaurantsArray.forEach(function(restaurant) {
+        if (restaurant.id === commentDislikesRestaurantId) {
+          restaurant.comments.forEach(function(comment) {
+            if (comment.id === commentDislikesId) {
+              comment.likes = increasedCommentDislikes
+            }
+          })
+        }
+      })
+
+      fetch(`${commentsUrl}/${commentDislikesId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({
+          dislikes: increasedCommentDislikes
+        })
+      })
+    }
+//******************** End of Add Disike to Comment ******************
+
 
   })
 //************* End of Event Delegation for Restaurants **************
-
-
-//************************* Fetch Comments ***************************
-  fetch(commentsUrl)
-    .then(res => res.json())
-    .then(allComments => {
-      console.log(allComments)
-    })
-//********************** End of Fetch Comments ***********************
 
 
 //**************************** Functions *****************************
@@ -263,6 +374,14 @@ document.addEventListener('DOMContentLoaded', function() {
     userDropdown.innerHTML += `
       <option value=${user.id}>${user.name}</option>
       `
+  }
+
+  function revealHeading() {
+    headingDiv.style.display = 'initial'
+  }
+
+  function hideWelcomePage() {
+    userChoiceButtons.style.display = 'none'
   }
 
   function revealRestaurants() {
@@ -293,17 +412,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function renderSingleRestaurant(singleRestaurant) {
     restaurantsContainer.innerHTML += `
-
       <div data-id=${singleRestaurant.id} class="restaurant-entry">
-      <h2 id="page-name">${singleRestaurant.name}</h2>
-      <p id="page-photo">Photo - ${singleRestaurant.photo}</p>
-      <p id="page-food-type">Food type: ${singleRestaurant.food_type}</p>
-      <p id="page-location">Location: ${singleRestaurant.location}</p>
-      <button id="likes-btn" data-id=${singleRestaurant.id}>Likes: ${singleRestaurant.likes}</button><button id="edit-btn" data-id=${singleRestaurant.id}>Edit</button>
-      <div data-id=${singleRestaurant.id} id="form-container">
-      </div>
+        <h2 id="page-name">${singleRestaurant.name}</h2>
+        <img id="page-photo" src=${singleRestaurant.photo}>
+        <p id="page-food-type">Food type: ${singleRestaurant.food_type}</p>
+        <p id="page-location">Location: ${singleRestaurant.location}</p>
+        <button id="likes-btn" data-id=${singleRestaurant.id}>Likes: ${singleRestaurant.likes}</button><button id="edit-btn" data-id=${singleRestaurant.id}>Edit</button>
+        <div data-id=${singleRestaurant.id} id="form-container">
+        </div>
+        <div data-id=${singleRestaurant.id} id="add-comment-container">
+          <form id="single-comment-form" data-id=${singleRestaurant.id}>
+          <label>Let us know your thoughts...</label>
+          <p>
+            <input id="comment-content" type="textarea" placeholder="comment here..." />
+          </p>
+          <button id="add-comment-btn" type="submit">Add Comment</button>
+        </div>
+        <div>Comments:
+          <ul id="comments-container-${singleRestaurant.id}">
+          </ul>
+        </div>
       </div>
       `
+
+    commentsContainer = document.querySelector(`#comments-container-${singleRestaurant.id}`)
+
+    singleRestaurant.comments.forEach(function(comment) {
+      commentsContainer.innerHTML += `
+        <li>${comment.content}</li>
+        <button data-id=${comment.id} id="comment-like-btn">Likes: ${comment.likes}</button><button data-id=${comment.id} id="comment-dislike-btn">Dislikes: ${comment.dislikes}</button>
+        `
+    })
+
   }
 
   function renderUpdateRestaurant(restaurantToUpdate) {
@@ -334,6 +474,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <label>Food Stop Name:</label>
       <p>
         <input id="new-name" type="text" placeholder="Restaurant name..." />
+      </p>
+      <label>Food Stop Photo:</label>
+      <p>
+        <input id="new-photo" type="text" placeholder="enter url..." />
       </p>
       <label>Food Stop Type:</label>
       <p>
