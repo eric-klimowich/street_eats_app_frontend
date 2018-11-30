@@ -1,19 +1,194 @@
+/************************ Main Body *************************/
 body {
-  background-color: papayawhip;
-  /* background-image: url(http://res.cloudinary.com/hksqkdlah/image/upload/w_1200,h_630,c_fill/ATK%20Food%20Truck/CAN_ATKFoodTruck_5391_23x9);
-  background-repeat: no-repeat;
-  background-blend-mode: lighten; */
+  /* background-color: honeydew; */
+  /* background-image: url(https://d2gg9evh47fn9z.cloudfront.net/800px_COLOURBOX18495677.jpg); */
+  /* background-image: url(https://cdn5.vectorstock.com/i/1000x1000/28/59/fast-food-background-vector-1352859.jpg); */
+  /* background-image: url(https://cdn4.vectorstock.com/i/1000x1000/36/58/food-seamless-background-vector-5613658.jpg); */
+  background-image: url(https://cdns.freeicon.org/data/8192/fast-food-background-various-symbols-sketch-repeating-design/fast-food-background-various-symbols-sketch-repeating-design-cover.png);
+  /* background-image: url(https://images.all-free-download.com/images/graphiclarge/fast_food_background_colored_handdrawn_design_6835170.jpg); */
+  background-attachment: fixed;
   font-size: 100%;
 }
+/********************* End of Main Body *********************/
 
+
+/*********************** Welcome Page ***********************/
 #welcome {
   text-align: center;
 }
 
-#welcome-title {
-  font-size: 3em;
-  text-shadow: 3px 3px gray;
+.title-and-tagline {
+  background-color: rgba(230, 204, 179, 0.7);;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 5px;
+  border-color: brown;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-right: 100px;
+  margin-left: 80px;
 }
+
+#welcome-title {
+  font-size: 5em;
+  text-shadow: 5px 5px gray;
+}
+
+#tagline {
+  font-size: 2.5em;
+}
+
+#new-user-btn {
+  padding: 28px 53px;
+  background-color: rgba(55, 92, 49);
+}
+
+#ret-user-btn {
+  padding: 28px 20px;
+  background-color: rgba(75, 88, 167);;
+}
+
+.user-btns {
+  color: white;
+  font-size: 30px;
+  border-radius: 12px;
+}
+
+.user-btns:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+/******************** End of Welcome Page *******************/
+
+
+/*********************** Add User Page **********************/
+#new-user-form-heading {
+  text-align: center;
+  font-size: 5em;
+  text-shadow: 5px 5px gray;
+  background-color: rgba(230, 204, 179, 0.7);;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 5px;
+  border-color: brown;
+}
+
+#new-user-form-container {
+  background-color: rgba(230, 204, 179, 0.7);;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 5px;
+  border-color: brown;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-right: 300px;
+  margin-left: 300px;
+  position: relative;
+}
+
+#new-user-form-intro {
+  text-align: center;
+}
+
+#new-user-form-div {
+  text-align: center;
+}
+
+#new-user-form {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.new-user-labels {
+  font-size: 30px;
+}
+
+.new-user-input-box {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  font-size: 22px;
+}
+
+#new-user-button {
+  padding: 12px 53px;
+  background-color: rgba(55, 92, 49);
+  color: white;
+  font-size: 30px;
+  border-radius: 12px;
+}
+
+.new-user-button-hover:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+/******************** End of Add User Page ******************/
+
+
+/******************** Returning User Page *******************/
+#ret-user-heading-container {
+  text-align: center;
+  font-size: 2em;
+  text-shadow: 5px 5px gray;
+  background-color: rgba(230, 204, 179, 0.7);;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 5px;
+  border-color: brown;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-right: 100px;
+  margin-left: 100px;
+}
+
+#select-user-container {
+  text-align: center;
+  font-size: 2em;
+  text-shadow: none;
+  background-color: rgba(230, 204, 179, 0.7);;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 5px;
+  border-color: brown;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  margin-right: 100px;
+  margin-left: 100px;
+}
+
+#userSelection {
+  width: 25%;
+  font-size: 28px;
+  padding: 16px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+}
+
+#select-ret-user {
+  padding-bottom: 30px;
+}
+
+#user-select-button {
+  padding: 12px 53px;
+  background-color: rgba(55, 92, 49);
+  color: white;
+  font-size: 30px;
+  border-radius: 12px;
+}
+
+.user-select-hover:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+/***************** End of Returning User Page ***************/
+
+
+
+
+
+
+
+
+
 
 #heading {
   display: none;
@@ -38,6 +213,10 @@ body {
 }
 
 #users-container {
+  display: none;
+}
+
+#restaurant-search-form {
   display: none;
 }
 

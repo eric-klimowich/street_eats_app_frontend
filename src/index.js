@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const restaurantsContainer = document.querySelector('#restaurant-container')
   const allRestaurantsContainer = document.querySelector('#all-restaurants-container')
   const addUserForm = document.querySelector('#add-user');
-  const userChoiceButtons = document.querySelector('#welcome')
+  const welcomePageWithButtons = document.querySelector('#welcome')
   const addRestaurantFormContainer = document.querySelector('#add-restaurant-form')
   const selectUserForm = document.querySelector('#users-container')
   const headingDiv = document.querySelector('#heading')
@@ -31,10 +31,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 //********************** Choose New/Return User **********************
-  userChoiceButtons.addEventListener('click', function(event) {
+  welcomePageWithButtons.addEventListener('click', function(event) {
     if (event.target.id === 'new-user-btn') {
+      hideWelcomePage()
       showAddUserForm()
     } else if (event.target.id === 'ret-user-btn') {
+      hideWelcomePage()
       showSelectUserForm()
       renderAllUsersToSelectForm(allUsersArray)
     }
@@ -44,23 +46,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 //************************* Add a New User ****************************
   addUserForm.innerHTML = `
-    <form id="new-user-form">
-      <h3>---User Form---</h3>
-      <label>User Name:</label>
-      <p>
-        <input id="user-name" type="text" placeholder="enter name..." />
-      </p>
-      <label>Location:</label>
-      <p>
-        <input id="user-location" type="text" placeholder="enter location..." />
-      </p>
-      <label>Favorite Food:</label>
-      <p>
-        <input id="user-fav-food" type="text" placeholder="enter favorite food..." />
-      </p>
-      <button type='submit' value='submit'>Submit</button>
-    </form>
+    <div class="animated fadeInLeft">
+      <h1 id="new-user-form-heading">Tell us about yourself...</h1>
+      <div id="new-user-form-container">
+        <div id="new-user-form-div">
+          <form id="new-user-form">
+            <label class="new-user-labels">User Name:</label>
+              <input class="new-user-input-box" id="user-name" type="text" placeholder="Nice to meet you..." />
+              <hr>
+            <label class="new-user-labels">Location:</label>
+              <input class="new-user-input-box" id="user-location" type="text" placeholder="Oh, you live in..." />
+              <hr>
+            <label class="new-user-labels">Favorite Food:</label>
+              <input class="new-user-input-box" id="user-fav-food" type="text" placeholder="I knew your favorite food was..." />
+              <hr>
+            <button id="new-user-button" class="new-user-button-hover" type='submit' value='submit'>Welcome!</button>
+          </form>
+        </div>
+      </div>
+    </div>
     `
+
   addUserForm.addEventListener('submit', function(event) {
     event.preventDefault()
     let userName = event.target.querySelector('#user-name').value
@@ -85,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
         addedUserId = addedUser.id
       })
 
-      hideWelcomePage()
       hideAddUserForm()
       revealHeading()
       renderNewRestaurantForm()
@@ -106,21 +111,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 //********************* Select from Existing User ********************
   selectUserForm.innerHTML = `
-    <form id="select-ret-user">
-      <select id="userSelection">
-      </select>
-      <button type="submit" value="submit">Select User</button>
-    </form>
-    <p>Choose your profile.</p>
+    <div class="animated fadeInRight">
+      <div id="ret-user-heading-container">
+        <h1 id="ret-user-form-heading">Welcome Back!</h1>
+      </div>
+      <div id="select-user-container">
+        <form id="select-ret-user">
+          <p>Choose your profile.</p>
+          <select id="userSelection">
+          </select>
+          <button id="user-select-button" class="user-select-hover" type="submit" value="submit">This is me.</button>
+        </form>
+      </div>
+    </div>
+
     `
   selectUserForm.addEventListener('submit', function(event) {
     event.preventDefault()
     addedUserId = parseInt(document.getElementById('userSelection').value)
-    hideWelcomePage()
+
     hideSelectUserForm()
     revealHeading()
     renderNewRestaurantForm()
     revealRestaurants()
+
   })
 //****************** End of Select from Existing User ****************
 
@@ -170,9 +184,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 //************************* Search Restaurants ***********************
   restaurantsSearchContainer.addEventListener('input', function(event) {
-    console.log(event.target.value)
+    let searchFieldValue = event.target.value
+    console.log(searchFieldValue)
+    let filteredRestaurants = allRestaurantsArray.filter(function(restaurant) {
+      return restaurant.name.toLowerCase().includes(searchFieldValue.toLowerCase())
+    })
+    restaurantsContainer.innerHTML = ""
+    renderAllRestaurants(filteredRestaurants)
   })
-
 //********************** End of Search Restaurants *******************
 
 
@@ -381,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function hideWelcomePage() {
-    userChoiceButtons.style.display = 'none'
+    welcomePageWithButtons.style.display = 'none'
   }
 
   function revealRestaurants() {
@@ -403,6 +422,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function hideSelectUserForm() {
     selectUserForm.style.display = 'none'
   }
+
+  function showSearchForm() {
+    restaurantsSearchContainer.style.display = 'initial'
+  }
+
 
   function renderAllRestaurants(restaurantArray) {
     restaurantArray.forEach(function(singleRestaurant) {
